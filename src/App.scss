@@ -1,43 +1,52 @@
 body {
-    background-color: #444;
-    color: #ccc;
-    font-family: sans-serif;
-    padding: 1rem;
- 
-    h1 {
-        font-size: 1.7rem;
-        margin: 0;
-    }
- 
-    animation: fadein .2s ease-in;
+	background-color: #444;
+	color: #ccc;
+	font-family: sans-serif;
+	padding: 1rem;
+
+	h1 {
+		font-size: 1.7rem;
+		margin: 0;
+	}
+
+	nav {
+		margin-top: .5rem;
+		margin-bottom: 1.5rem;
+		padding-bottom: .5rem;
+		border-bottom: 1px solid #555;
+
+		a {
+			color: #aaa;
+			text-decoration: none;
+		}
+
+		a:not(:last-of-type)::after {
+			color: #444;
+			content: ' | ';
+		}
+
+		a.active {
+			color: yellow;
+		}
+	}
+
+	.page404 {
+		color: #333;
+
+		p {
+			font-size: 3rem;
+		}
+	}
+
+	animation: fadein .2s ease-in;
 }
- 
+
 @keyframes fadein {
-    from {
-        opacity: 0;
-    }
- 
-    to {
-        opacity: 1;
-    }
-}
-nav {
-    margin-top: .5rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: .5rem;
-    border-bottom: 1px solid #555;
- 
-    a {
-        color: #aaa;
-        text-decoration: none;
-    }
- 
-    a:not(:last-of-type)after {
-        color: #444;
-        content: ' | ';
-    }
- 
-    a.active {
-        color: yellow;
-    }
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
 }
