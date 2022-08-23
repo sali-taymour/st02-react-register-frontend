@@ -1,24 +1,19 @@
-import "./App.scss";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { NavLink, Route, Routes, Navigate } from "react-router-dom";
+import "./App.scss";
 import { IUser } from "./interfaces";
-import { Page404 } from "./pages/Page404";
-
+import { NavLink, Route, Routes, Navigate } from "react-router-dom";
 import { PageWelcome } from "./pages/PageWelcome";
 import { PageMembers } from "./pages/PageMembers";
 import { PageRegister } from "./pages/PageRegister";
 import { PageLogin } from "./pages/PageLogin";
 import { PageLogout } from "./pages/PageLogout";
 import { PageConfirmLink } from "./pages/PageConfirmLink";
+import { Page404 } from "./pages/Page404";
 
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
-console.log(baseUrl, 'baseUrl');
 function App() {
-
-
-
     const [currentUser, setCurrentUser] = useState<IUser>({
         username: "",
         firstName: "",
@@ -33,11 +28,10 @@ function App() {
             setCurrentUser(_currentUser);
         })();
     }, []);
+
     return (
         <div className="App">
             <h1>Language Tandem Group</h1>
-            <h1>{currentUser.username}</h1>
-            <p>testing</p>
             <nav>
                 <NavLink to="/welcome">Welcome</NavLink>
                 {currentUser.accessGroups.includes("members") && (
@@ -69,5 +63,3 @@ function App() {
 }
 
 export default App;
-
-
