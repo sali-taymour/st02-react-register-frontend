@@ -40,6 +40,12 @@ body {
 
 	animation: fadein .2s ease-in;
 }
+.page404 {
+    color: #333;
+    p {
+        font-size: 4rem;
+    }
+}
 
 @keyframes fadein {
 	from {
