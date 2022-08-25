@@ -23,7 +23,11 @@ function App() {
 
     useEffect(() => {
         (async () => {
-            const data = (await axios.get(`${baseUrl}/current-user`)).data;
+            const data = (
+                await axios.get(`${baseUrl}/current-user`, {
+                    withCredentials: true,
+                })
+            ).data;
             const _currentUser = data.currentUser;
             setCurrentUser(_currentUser);
         })();
@@ -32,13 +36,20 @@ function App() {
     return (
         <div className="App">
             <h1>Language Tandem Group</h1>
+            <div>
+                {currentUser.firstName} {currentUser.lastName}
+            </div>
             <nav>
                 <NavLink to="/welcome">Welcome</NavLink>
                 {currentUser.accessGroups.includes("members") && (
                     <NavLink to="/members">Members</NavLink>
                 )}
-                <NavLink to="/register">Register</NavLink>
-                <NavLink to="/login">Login</NavLink>
+                {currentUser.accessGroups.includes("loggedOutUsers") && (
+                    <NavLink to="/register">Register</NavLink>
+                )}
+                {currentUser.accessGroups.includes("loggedOutUsers") && (
+                    <NavLink to="/login">Login</NavLink>
+                )}
                 {currentUser.accessGroups.includes("loggedInUsers") && (
                     <NavLink to="/logout">Logout</NavLink>
                 )}
@@ -50,14 +61,30 @@ function App() {
                 {currentUser.accessGroups.includes("members") && (
                     <Route path="/members" element={<PageMembers />} />
                 )}
-                <Route path="/register" element={<PageRegister />} />
-                <Route path="/login" element={<PageLogin />} />
+                {currentUser.accessGroups.includes("loggedOutUsers") && (
+                    <Route path="/register" element={<PageRegister />} />
+                )}
+                {currentUser.accessGroups.includes("loggedOutUsers") && (
+                    <Route
+                        path="/login"
+                        element={
+                            <PageLogin
+                                baseUrl={baseUrl}
+                                setCurrentUser={setCurrentUser}
+                            />
+                        }
+                    />
+                )}
                 {currentUser.accessGroups.includes("loggedInUsers") && (
-                    <Route path="/logout" element={<PageLogout />} />
+                    <Route
+                        path="/logout"
+                        element={<PageLogout baseUrl={baseUrl} setCurrentUser={setCurrentUser} />}
+                    />
                 )}
                 <Route path="/confirm-link" element={<PageConfirmLink />} />
                 <Route path="/" element={<Navigate to="/welcome" replace />} />
             </Routes>
+           
         </div>
     );
 }
