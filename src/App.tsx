@@ -12,7 +12,7 @@ import { PageConfirmLink } from "./pages/PageConfirmLink";
 import { Page404 } from "./pages/Page404";
 
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
-
+console.log(`*********** baseUrl = [${baseUrl}]`);
 function App() {
     const [currentUser, setCurrentUser] = useState<IUser>({
         username: "",
