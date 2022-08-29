@@ -21,7 +21,7 @@ export const PageLogin = (props: IPageLoginProps) => {
             const data = (
                 await axios.post(
                     `${baseUrl}/login`,
-                    { username },
+                    { username , password },
                     { withCredentials: true }
                 )
             ).data;
