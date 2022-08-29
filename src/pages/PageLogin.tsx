@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { IUser } from "../interfaces";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ export const PageLogin = (props: IPageLoginProps) => {
     const [formMessage, setFormMessage] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+
     const navigate = useNavigate();
 
     const handleLoginButton = (e: React.MouseEvent<HTMLElement>) => {
@@ -21,7 +22,11 @@ export const PageLogin = (props: IPageLoginProps) => {
             const data = (
                 await axios.post(
                     `${baseUrl}/login`,
-                    { username , password },
+                    {
+                        username,
+                        password,
+                        safeOriginCode: import.meta.env.VITE_SAFE_ORIGIN_CODE,
+                    },
                     { withCredentials: true }
                 )
             ).data;
@@ -37,6 +42,10 @@ export const PageLogin = (props: IPageLoginProps) => {
             }
         })();
     };
+
+    useEffect(() => {
+        setFormMessage("");
+    }, [username, password]);
 
     return (
         <form>

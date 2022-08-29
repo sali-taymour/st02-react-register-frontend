@@ -1,17 +1,20 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.scss";
-import { IUser } from "./interfaces";
 import { NavLink, Route, Routes, Navigate } from "react-router-dom";
+import { IUser } from "./interfaces";
 import { PageWelcome } from "./pages/PageWelcome";
 import { PageMembers } from "./pages/PageMembers";
 import { PageRegister } from "./pages/PageRegister";
 import { PageLogin } from "./pages/PageLogin";
 import { PageLogout } from "./pages/PageLogout";
-import { PageConfirmLink } from "./pages/PageConfirmLink";
+import { PageConfirmRegistration } from "./pages/PageConfirmRegistration";
 import { Page404 } from "./pages/Page404";
+import { useNavigate } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa";
 
-const baseUrl = import.meta.env.VITE_BACKEND_URL
+const baseUrl = import.meta.env.VITE_BACKEND_URL;
+
 function App() {
     const [currentUser, setCurrentUser] = useState<IUser>({
         username: "",
@@ -19,6 +22,8 @@ function App() {
         lastName: "",
         accessGroups: [],
     });
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         (async () => {
@@ -32,17 +37,50 @@ function App() {
         })();
     }, []);
 
+    const handleLogoutButton = () => {
+        (async () => {
+            const data = (
+                await axios.get(`${baseUrl}/logout`, {
+                    withCredentials: true,
+                })
+            ).data;
+            const _currentUser = data.currentUser;
+            if (_currentUser.username === "anonymousUser") {
+                setCurrentUser(_currentUser);
+                navigate("/");
+            } else {
+                throw new Error("ERROR: no anonymous user");
+            }
+        })();
+    };
+
+    const pageIsLoaded = () => {
+        return currentUser.username !== "";
+    };
+
     return (
         <div className="App">
             <h1>Language Tandem Group</h1>
-            <div>
-                {currentUser.firstName} {currentUser.lastName}
-            </div>
+            {pageIsLoaded() && currentUser.username !== "anonymousUser" && (
+                <div className="userFullName">
+                    <span>
+                        {currentUser.firstName} {currentUser.lastName}
+                    </span>
+                </div>
+            )}
             <nav>
                 <NavLink to="/welcome">Welcome</NavLink>
-                {currentUser.accessGroups.includes("members") && (
-                    <NavLink to="/members">Members</NavLink>
+                {!pageIsLoaded() && (
+                    <span className="navCommand">
+                        <span className="spinner">
+                            <FaSpinner />
+                        </span>
+                    </span>
                 )}
+                {(currentUser.accessGroups.includes("members") ||
+                    currentUser.accessGroups.includes(
+                        "unconfirmedMembers"
+                    )) && <NavLink to="/members">Members</NavLink>}
                 {currentUser.accessGroups.includes("loggedOutUsers") && (
                     <NavLink to="/register">Register</NavLink>
                 )}
@@ -50,40 +88,63 @@ function App() {
                     <NavLink to="/login">Login</NavLink>
                 )}
                 {currentUser.accessGroups.includes("loggedInUsers") && (
-                    <NavLink to="/logout">Logout</NavLink>
+                    <span className="navCommand" onClick={handleLogoutButton}>
+                        Logout
+                    </span>
                 )}
             </nav>
-
             <Routes>
                 <Route path="*" element={<Page404 />} />
                 <Route path="/welcome" element={<PageWelcome />} />
-                {currentUser.accessGroups.includes("members") && (
-                    <Route path="/members" element={<PageMembers />} />
-                )}
-                {currentUser.accessGroups.includes("loggedOutUsers") && (
-                    <Route path="/register" element={<PageRegister />} />
-                )}
-                {currentUser.accessGroups.includes("loggedOutUsers") && (
+                {(currentUser.accessGroups.includes("members") ||
+                    currentUser.accessGroups.includes(
+                        "unconfirmedMembers"
+                    )) && (
                     <Route
-                        path="/login"
+                        path="/members"
+                        element={<PageMembers currentUser={currentUser} />}
+                    />
+                )}
+                <Route
+                    path="/register"
+                    element={
+                        <PageRegister
+                            baseUrl={baseUrl}
+                            setCurrentUser={setCurrentUser}
+                        />
+                    }
+                />
+                <Route
+                    path="/login"
+                    element={
+                        <PageLogin
+                            baseUrl={baseUrl}
+                            setCurrentUser={setCurrentUser}
+                        />
+                    }
+                />
+                {currentUser.accessGroups.includes("loggedInUsers") && (
+                    <Route
+                        path="/logout"
                         element={
-                            <PageLogin
+                            <PageLogout
                                 baseUrl={baseUrl}
                                 setCurrentUser={setCurrentUser}
                             />
                         }
                     />
                 )}
-                {currentUser.accessGroups.includes("loggedInUsers") && (
-                    <Route
-                        path="/logout"
-                        element={<PageLogout baseUrl={baseUrl} setCurrentUser={setCurrentUser} />}
-                    />
-                )}
-                <Route path="/confirm-link" element={<PageConfirmLink />} />
+                <Route
+                    path="/confirm-registration/:confirmationCode"
+                    element={
+                        <PageConfirmRegistration
+                            baseUrl={baseUrl}
+                            setCurrentUser={setCurrentUser}
+                        />
+                    }
+                />
                 <Route path="/" element={<Navigate to="/welcome" replace />} />
             </Routes>
-           
         </div>
     );
 }
